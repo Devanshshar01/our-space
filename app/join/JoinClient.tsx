@@ -4,6 +4,19 @@ import { useState, FormEvent, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
+function extractCodeFromInput(input: string): string {
+  const trimmed = input.trim();
+  // If input looks like a URL with code parameter, extract it
+  try {
+    const url = new URL(trimmed);
+    const codeParam = url.searchParams.get('code');
+    if (codeParam) return codeParam.trim();
+  } catch {
+    // Not a valid URL, use as-is
+  }
+  return trimmed;
+}
+
 export default function JoinClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -18,7 +31,8 @@ export default function JoinClient() {
 
   async function join() {
     setError('');
-    if (!code.trim()) {
+    const extractedCode = extractCodeFromInput(code);
+    if (!extractedCode) {
       setError('Invitation code is required');
       return;
     }
@@ -27,11 +41,11 @@ export default function JoinClient() {
       const res = await fetch('/api/couple-space/invitations/redeem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: code.trim() }),
+        body: JSON.stringify({ code: extractedCode }),
       });
-      const data = (await res.json()) as { ok?: boolean; error?: string; spaceId?: string };
+      const data = (await res.json()) as { ok?: boolean; error?: string; errorCode?: string; spaceId?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error || 'Failed to join');
+        setError(mapErrorToMessage(data.error, data.errorCode));
         setLoading(false);
         return;
       }
@@ -43,9 +57,49 @@ export default function JoinClient() {
     }
   }
 
+  function mapErrorToMessage(error?: string, errorCode?: string): string {
+    // Use error code for precise mapping, fall back to error message
+    switch (errorCode) {
+      case 'INVITATION_NOT_FOUND':
+        return 'Invitation not found. Please check the link or code.';
+      case 'INVITATION_ALREADY_USED':
+        return 'This invitation has already been used.';
+      case 'INVITATION_REVOKED':
+        return 'This invitation has been revoked.';
+      case 'INVITATION_EXPIRED':
+        return 'This invitation has expired. Please ask your partner for a new one.';
+      case 'INVITATION_INVALID':
+        return 'Invalid invitation. Please check the link or code.';
+      case 'SELF_JOIN':
+        return 'You cannot use your own invitation.';
+      case 'ALREADY_IN_SPACE':
+        return 'You already belong to a Couple Space.';
+      case 'SPACE_NOT_FOUND':
+        return 'Couple Space not found.';
+      case 'SPACE_NOT_PENDING':
+        return 'This Couple Space is no longer accepting invitations.';
+      case 'SPACE_FULL':
+        return 'This Couple Space is already full.';
+      case 'INVALID_CODE':
+        return 'Invalid invitation code format.';
+      case 'UNAUTHORIZED':
+        return 'Please sign in to join a space.';
+      case 'INVALID_BODY':
+        return 'Invalid request. Please try again.';
+      default:
+        return error || 'Failed to join. Please try again.';
+    }
+  }
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await join();
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text');
+    setCode(extractCodeFromInput(pasted));
   };
 
   return (
@@ -68,6 +122,7 @@ export default function JoinClient() {
               name="code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
+              onPaste={handlePaste}
               placeholder="https://…/join?code=…  or paste the code"
               required
               disabled={loading}
