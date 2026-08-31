@@ -1,0 +1,163 @@
+import { redirect } from 'next/navigation';
+import { getAuthSession } from '@/lib/auth/server';
+import { getCurrentCoupleSpace } from '@/lib/couple-space/service';
+import DashboardHero from '@/components/our-space/dashboard/DashboardHero';
+import AppLauncher from '@/components/our-space/app-launcher/AppLauncher';
+import QuickActions from '@/components/our-space/dashboard/QuickActions';
+import MobileNav from '@/components/our-space/navigation/MobileNav';
+import DesktopNav from '@/components/our-space/navigation/DesktopNav';
+
+export const dynamic = 'force-dynamic';
+
+export default async function DashboardPage() {
+  const session = await getAuthSession();
+  if (!session) {
+    redirect('/login?redirect=/dashboard');
+  }
+
+  const view = await getCurrentCoupleSpace(session.user.id);
+
+  if (!view) {
+    redirect('/onboard');
+  }
+
+  if (view.status === 'PENDING') {
+    redirect('/onboard/pending');
+  }
+
+  const me = view.members.find((m) => m.isCurrentUser);
+  const partner = view.members.find((m) => !m.isCurrentUser);
+  const currentUserName = me?.name ?? session.user.name;
+  const partnerName = partner?.name ?? null;
+
+  return (
+    <div style={styles.layout}>
+      <header style={styles.headerBar} role="banner">
+        <div style={styles.headerInner}>
+          <div style={styles.headerBrand}>
+            <p style={styles.brandEyebrow}>Our Space</p>
+            <p style={styles.brandTitle}>
+              {view.space.customName || 'Our Space'}
+            </p>
+          </div>
+          <div className="desktop-nav-only" style={styles.desktopNavWrapper}>
+            <DesktopNav />
+          </div>
+        </div>
+      </header>
+
+      <main style={styles.main} id="main-content">
+        <div style={styles.coupleBanner}>
+          <p style={styles.coupleText}>
+            <span style={styles.coupleNameYou}>{currentUserName}</span>
+            {partnerName && (
+              <>
+                <span style={styles.coupleAmp}> &amp; </span>
+                <span style={styles.coupleNamePartner}>{partnerName}</span>
+              </>
+            )}
+          </p>
+        </div>
+
+        <DashboardHero
+          spaceName={view.space.customName}
+          anniversaryDate={view.space.anniversaryDate}
+          currentUserName={currentUserName}
+        />
+
+        <div id="quick-actions" style={styles.section}>
+          <QuickActions />
+        </div>
+
+        <div id="apps" style={styles.section}>
+          <AppLauncher />
+        </div>
+      </main>
+
+      <div className="mobile-nav-only" style={styles.mobileNavWrapper}>
+        <MobileNav />
+      </div>
+    </div>
+  );
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  layout: {
+    minHeight: '100dvh',
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: 'var(--color-background)',
+  },
+  headerBar: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 10,
+    backgroundColor: 'var(--color-surface)',
+    borderBottom: '1px solid var(--color-border)',
+  },
+  headerInner: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem)',
+    maxWidth: '1200px',
+    margin: '0 auto',
+  },
+  headerBrand: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.125rem',
+  },
+  brandEyebrow: {
+    fontSize: '0.6rem',
+    letterSpacing: '0.25em',
+    textTransform: 'uppercase',
+    color: 'var(--color-muted)',
+    margin: 0,
+  },
+  brandTitle: {
+    fontSize: 'clamp(1.125rem, 3vw, 1.375rem)',
+    fontWeight: 300,
+    letterSpacing: '-0.02em',
+    color: 'var(--color-foreground)',
+    margin: 0,
+  },
+  desktopNavWrapper: {
+    display: 'none',
+  },
+  main: {
+    flex: 1,
+    width: '100%',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '0 clamp(1rem, 3vw, 1.5rem)',
+    paddingBottom: 'clamp(5rem, 10vh, 6rem)',
+  },
+  coupleBanner: {
+    padding: 'clamp(1rem, 3vw, 1.5rem) 0',
+    textAlign: 'center',
+    borderBottom: '1px solid var(--color-border)',
+    marginBottom: '0.5rem',
+  },
+  coupleText: {
+    fontSize: 'clamp(1rem, 2.5vw, 1.125rem)',
+    color: 'var(--color-foreground)',
+    margin: 0,
+  },
+  coupleNameYou: {
+    fontWeight: 500,
+  },
+  coupleNamePartner: {
+    fontWeight: 500,
+  },
+  coupleAmp: {
+    color: 'var(--color-muted)',
+    margin: '0 0.25rem',
+  },
+  section: {
+    marginBottom: 'clamp(1.5rem, 4vw, 2.5rem)',
+  },
+  mobileNavWrapper: {
+    display: 'block',
+  },
+};
