@@ -3,18 +3,17 @@
 import { useState, useEffect } from 'react';
 import AppCard from './AppCard';
 
+interface AppLauncherProps {
+  canvasUrl: string;
+  notesUrl: string;
+}
+
 interface AppConfig {
   name: string;
   description: string;
   icon: React.ReactNode;
   status: 'available' | 'coming-soon';
   href: string;
-}
-
-function resolveUrl(envVarName: string, fallback: string): string {
-  // NEXT_PUBLIC_ vars are inlined at build time
-  const env = process.env as Record<string, string | undefined>;
-  return env[envVarName] || fallback;
 }
 
 const APP_DEFINITIONS: Array<Omit<AppConfig, 'href'>> = [
@@ -118,24 +117,24 @@ const APP_DEFINITIONS: Array<Omit<AppConfig, 'href'>> = [
   },
 ];
 
-function getApps(): AppConfig[] {
+function getApps(canvasUrl: string, notesUrl: string): AppConfig[] {
   return APP_DEFINITIONS.map((app) => {
     let href = '#';
     if (app.name === 'Canvas') {
-      href = resolveUrl('NEXT_PUBLIC_CANVAS_APP_URL', 'http://localhost:3001');
+      href = canvasUrl;
     } else if (app.name === 'Notes') {
-      href = resolveUrl('NEXT_PUBLIC_NOTES_APP_URL', 'http://localhost:3002');
+      href = notesUrl;
     }
     return { ...app, href };
   });
 }
 
-export default function AppLauncher() {
-  const [apps, setApps] = useState<AppConfig[]>(getApps);
+export default function AppLauncher({ canvasUrl, notesUrl }: AppLauncherProps) {
+  const [apps, setApps] = useState<AppConfig[]>(getApps(canvasUrl, notesUrl));
 
   useEffect(() => {
-    setApps(getApps());
-  }, []);
+    setApps(getApps(canvasUrl, notesUrl));
+  }, [canvasUrl, notesUrl]);
 
   return (
     <section style={styles.section} aria-label="Applications">

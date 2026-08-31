@@ -2,19 +2,17 @@
 
 import { useState, useEffect } from 'react';
 
-function getUrls(): { canvas: string; notes: string } {
-  return {
-    canvas: process.env.NEXT_PUBLIC_CANVAS_APP_URL || 'http://localhost:3001',
-    notes: process.env.NEXT_PUBLIC_NOTES_APP_URL || 'http://localhost:3002',
-  };
+interface QuickActionsProps {
+  canvasUrl: string;
+  notesUrl: string;
 }
 
-export default function QuickActions() {
-  const [urls, setUrls] = useState(getUrls);
+export default function QuickActions({ canvasUrl, notesUrl }: QuickActionsProps) {
+  const [urls, setUrls] = useState({ canvas: canvasUrl, notes: notesUrl });
 
   useEffect(() => {
-    setUrls(getUrls());
-  }, []);
+    setUrls({ canvas: canvasUrl, notes: notesUrl });
+  }, [canvasUrl, notesUrl]);
 
   return (
     <section style={styles.section} aria-label="Quick actions">

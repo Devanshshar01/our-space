@@ -30,6 +30,9 @@ export default async function DashboardPage() {
   const currentUserName = me?.name ?? session.user.name;
   const partnerName = partner?.name ?? null;
 
+  const canvasUrl = process.env.NEXT_PUBLIC_CANVAS_APP_URL ?? 'http://localhost:3001';
+  const notesUrl = process.env.NEXT_PUBLIC_NOTES_APP_URL ?? 'http://localhost:3002';
+
   return (
     <div style={styles.layout}>
       <header style={styles.headerBar} role="banner">
@@ -52,7 +55,7 @@ export default async function DashboardPage() {
             <span style={styles.coupleNameYou}>{currentUserName}</span>
             {partnerName && (
               <>
-                <span style={styles.coupleAmp}> &amp; </span>
+                <span style={styles.coupleAmp}> & </span>
                 <span style={styles.coupleNamePartner}>{partnerName}</span>
               </>
             )}
@@ -66,11 +69,11 @@ export default async function DashboardPage() {
         />
 
         <div id="quick-actions" style={styles.section}>
-          <QuickActions />
+          <QuickActions canvasUrl={canvasUrl} notesUrl={notesUrl} />
         </div>
 
         <div id="apps" style={styles.section}>
-          <AppLauncher />
+          <AppLauncher canvasUrl={canvasUrl} notesUrl={notesUrl} />
         </div>
       </main>
 
