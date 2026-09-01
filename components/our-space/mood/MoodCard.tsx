@@ -17,6 +17,7 @@ interface MoodCardProps {
 }
 
 const moodLabels: Record<Mood, string> = { GREAT: 'Great', GOOD: 'Good', MEH: 'Meh', SAD: 'Sad', FRUSTRATED: 'Frustrated', MISSING_YOU: 'Missing you' };
+const moodGifPaths: Record<Mood, string> = { GREAT: '/moods/great.gif', GOOD: '/moods/good.gif', MEH: '/moods/meh.gif', SAD: '/moods/sad.gif', FRUSTRATED: '/moods/frustrated.gif', MISSING_YOU: '/moods/missing-you.gif' };
 
 function formatRelativeTime(date: Date | null): string {
   if (!date) return '';
@@ -36,14 +37,11 @@ export default function MoodCard({ mood, updatedAt, name, image, isCurrentUser, 
   return (
     <article className="mood-card">
       <div className="mood-card-topline">
-        <div className="mood-person">
-          <Avatar src={image ?? undefined} name={name} size="md" />
-          <div><p className="mood-name">{name}</p><p className="mood-role">{isCurrentUser ? 'You' : 'Shared with you'}</p></div>
-        </div>
+        <div className="mood-person"><Avatar src={image ?? undefined} name={name} size="md" /><div><p className="mood-name">{name}</p><p className="mood-role">{isCurrentUser ? 'You' : 'Shared with you'}</p></div></div>
         {isCurrentUser && onEdit && <Button variant="ghost" size="sm" onClick={onEdit} aria-label="Change mood">Edit</Button>}
       </div>
       {mood ? (
-        <div className="mood-reading"><span className="mood-indicator" aria-hidden="true" /><div><p className="mood-label">{moodLabels[mood]}</p><Badge variant="accent" size="sm" dot>Current status</Badge></div></div>
+        <div className="mood-reading"><div className="mood-gif-wrap"><img src={moodGifPaths[mood]} alt="" /></div><div><p className="mood-label">{moodLabels[mood]}</p><Badge variant="accent" size="sm" dot>Current status</Badge></div></div>
       ) : (
         <div className="mood-empty"><p>{isCurrentUser ? 'No mood yet' : 'Nothing here yet.'}</p>{isCurrentUser && onEdit && <Button variant="primary" size="sm" onClick={onEdit}>Set your mood</Button>}</div>
       )}

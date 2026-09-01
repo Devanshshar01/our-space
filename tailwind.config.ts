@@ -19,6 +19,7 @@ const config: Config = {
         'border-light': 'var(--color-border-light)',
         accent: 'var(--color-accent)',
         'accent-hover': 'var(--color-accent-hover)',
+        'accent-secondary': 'var(--color-accent-secondary)',
         'accent-subtle': 'var(--color-accent-subtle)',
         error: 'var(--color-error)',
         'error-bg': 'var(--color-error-bg)',
