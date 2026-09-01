@@ -73,7 +73,11 @@ export default async function DashboardPage() {
         />
 
         <div id="mood" className="dashboard-section" style={styles.section}>
-          <MoodSection moods={moods.ok ? moods.moods : { me: null, partner: null }} />
+          <MoodSection
+            moods={moods.ok ? moods.moods : { me: null, partner: null }}
+            currentUserName={currentUserName}
+            partnerName={partnerName}
+          />
         </div>
 
         <div id="quick-actions" className="dashboard-section" style={styles.section}>
