@@ -22,7 +22,7 @@ export default function SignOutPage() {
   }, []);
 
   return (
-    <main style={styles.main}>
+    <main className="centered-shell" style={styles.main}>
       <div style={styles.card}>
         <h1 style={styles.title}>Signing you out…</h1>
         {error && <p style={styles.error} role="alert">{error}</p>}

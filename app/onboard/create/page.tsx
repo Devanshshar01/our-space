@@ -38,14 +38,15 @@ export default function CreateSpacePage() {
   };
 
   return (
-    <main style={styles.main}>
+    <main className="centered-shell" style={styles.main}>
       <div style={styles.card}>
-        <header style={styles.header}>
-          <h1 style={styles.title}>Create our space</h1>
-          <p style={styles.subtitle}>Both fields are optional. You can change them later.</p>
+        <header className="centered-heading" style={styles.header}>
+          <p className="eyebrow">Make it ours</p>
+          <h1 style={styles.title}>Create our space.</h1>
+          <p style={styles.subtitle}>Both fields are optional. We can change them later.</p>
         </header>
 
-        {error && <div style={styles.error} role="alert">{error}</div>}
+        {error && <div className="error-message" style={styles.error} role="alert">{error}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form} noValidate>
           <div style={styles.field}>

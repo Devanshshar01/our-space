@@ -83,16 +83,17 @@ export default function SignupForm() {
   };
 
   return (
-    <main style={styles.main}>
-      <div style={styles.card}>
-        <header style={styles.header}>
-          <h1 style={styles.title}>Create Account</h1>
-          <p style={styles.subtitle}>Join Couple Space</p>
+    <main className="auth-shell" style={styles.main}>
+      <div className="auth-card" style={styles.card}>
+        <header className="auth-heading" style={styles.header}>
+          <p className="eyebrow">Make room for us</p>
+          <h1 style={styles.title}>Create your account.</h1>
+          <p style={styles.subtitle}>Then we&apos;ll make a place to share.</p>
         </header>
 
-        {error && <div style={styles.error} role="alert">{error}</div>}
+        {error && <div className="error-message" style={styles.error} role="alert">{error}</div>}
 
-        <form onSubmit={handleSubmit} style={styles.form} noValidate>
+        <form onSubmit={handleSubmit} className="form-stack" style={styles.form} noValidate>
           <div style={styles.field}>
             <label htmlFor="name" style={styles.label}>
               Display Name
@@ -180,9 +181,9 @@ export default function SignupForm() {
           </button>
         </form>
 
-        <p style={styles.footer}>
+        <p className="form-footer" style={styles.footer}>
           Already have an account?{' '}
-          <Link href={`/login?redirect=${encodeURIComponent(redirect)}`} style={styles.link}>
+          <Link className="quiet-link" href={`/login?redirect=${encodeURIComponent(redirect)}`} style={styles.link}>
             Sign in
           </Link>
         </p>

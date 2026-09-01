@@ -41,16 +41,17 @@ export default function LoginForm() {
   };
 
   return (
-    <main style={styles.main}>
-      <div style={styles.card}>
-        <header style={styles.header}>
-          <h1 style={styles.title}>Sign In</h1>
+    <main className="auth-shell" style={styles.main}>
+      <div className="auth-card" style={styles.card}>
+        <header className="auth-heading" style={styles.header}>
+          <p className="eyebrow">Welcome back</p>
+          <h1 style={styles.title}>Come on in.</h1>
           <p style={styles.subtitle}>Welcome back to Couple Space</p>
         </header>
 
-        {error && <div style={styles.error} role="alert">{error}</div>}
+        {error && <div className="error-message" style={styles.error} role="alert">{error}</div>}
 
-        <form onSubmit={handleSubmit} style={styles.form} noValidate>
+        <form onSubmit={handleSubmit} className="form-stack" style={styles.form} noValidate>
           <div style={styles.field}>
             <label htmlFor="email" style={styles.label}>
               Email
@@ -98,9 +99,9 @@ export default function LoginForm() {
           </button>
         </form>
 
-        <p style={styles.footer}>
+        <p className="form-footer" style={styles.footer}>
           Don't have an account?{' '}
-          <Link href={`/signup?redirect=${encodeURIComponent(redirect)}`} style={styles.link}>
+          <Link className="quiet-link" href={`/signup?redirect=${encodeURIComponent(redirect)}`} style={styles.link}>
             Sign up
           </Link>
         </p>

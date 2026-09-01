@@ -23,13 +23,13 @@ export default async function OnboardPage() {
   }
 
   return (
-    <main style={styles.main}>
+    <main className="centered-shell" style={styles.main}>
       <div style={styles.container}>
-        <header style={styles.header}>
-          <p style={styles.eyebrow}>Step one</p>
+        <header className="centered-heading" style={styles.header}>
+          <p className="eyebrow" style={styles.eyebrow}>A place for us</p>
           <h1 style={styles.title}>Set up your space</h1>
           <p style={styles.subtitle}>
-            Hi {session.user.name}. How would you like to start?
+            Hi {session.user.name}. How should we start?
           </p>
         </header>
 
@@ -38,7 +38,7 @@ export default async function OnboardPage() {
             <div style={styles.optionHeader}>
               <h2 style={styles.optionTitle}>Create our space</h2>
               <p style={styles.optionDescription}>
-                Start fresh. You&apos;ll invite your partner after.
+                Start fresh, then invite your person in.
               </p>
             </div>
             <span style={styles.arrow} aria-hidden="true">→</span>
@@ -48,7 +48,7 @@ export default async function OnboardPage() {
             <div style={styles.optionHeader}>
               <h2 style={styles.optionTitle}>Join with an invite</h2>
               <p style={styles.optionDescription}>
-                Open a partner&apos;s invite link or paste their code.
+                Use the link they sent you.
               </p>
             </div>
             <span style={styles.arrow} aria-hidden="true">→</span>

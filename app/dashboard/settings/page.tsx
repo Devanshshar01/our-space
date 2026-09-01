@@ -14,13 +14,13 @@ export default async function SettingsPage() {
   const view = await getCurrentCoupleSpace(session.user.id);
 
   return (
-    <main style={styles.main}>
+    <main className="centered-shell settings-shell" style={styles.main}>
       <div style={styles.container}>
-        <header style={styles.header}>
+        <header className="centered-heading" style={styles.header}>
           <Link href="/dashboard" style={styles.backLink}>← Back</Link>
           <h1 style={styles.title}>Settings</h1>
           <p style={styles.subtitle}>
-            Our Space settings are coming next.
+            The quiet details about this little place.
           </p>
         </header>
 
@@ -58,7 +58,6 @@ export default async function SettingsPage() {
             <li>Edit space name and anniversary</li>
             <li>Change your display name</li>
             <li>Manage your session</li>
-            <li>Account deletion</li>
           </ul>
         </section>
 

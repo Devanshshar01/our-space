@@ -85,16 +85,17 @@ export default function PendingSpaceClient() {
   }
 
   return (
-    <main style={styles.main}>
+    <main className="centered-shell" style={styles.main}>
       <div style={styles.card}>
-        <header style={styles.header}>
-          <h1 style={styles.title}>Waiting for your partner</h1>
+        <header className="centered-heading" style={styles.header}>
+          <p className="eyebrow">Almost there</p>
+          <h1 style={styles.title}>Waiting for your person.</h1>
           <p style={styles.subtitle}>
             Your space is ready. Share the invite link with your partner.
           </p>
         </header>
 
-        {error && <div style={styles.error} role="alert">{error}</div>}
+        {error && <div className="error-message" style={styles.error} role="alert">{error}</div>}
 
         {!invite && (
           <button onClick={generateInvite} disabled={loading} style={styles.button}>

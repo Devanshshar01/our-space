@@ -103,14 +103,15 @@ export default function JoinClient() {
   };
 
   return (
-    <main style={styles.main}>
+    <main className="centered-shell" style={styles.main}>
       <div style={styles.card}>
-        <header style={styles.header}>
-          <h1 style={styles.title}>Join a space</h1>
+        <header className="centered-heading" style={styles.header}>
+          <p className="eyebrow">An invitation</p>
+          <h1 style={styles.title}>Come find us.</h1>
           <p style={styles.subtitle}>Paste the invite link or code your partner shared.</p>
         </header>
 
-        {error && <div style={styles.error} role="alert">{error}</div>}
+        {error && <div className="error-message" style={styles.error} role="alert">{error}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form} noValidate>
           <div style={styles.field}>

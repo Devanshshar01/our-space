@@ -137,9 +137,9 @@ export default function AppLauncher({ canvasUrl, notesUrl }: AppLauncherProps) {
   }, [canvasUrl, notesUrl]);
 
   return (
-    <section style={styles.section} aria-label="Applications">
+    <section style={styles.section} aria-label="Our stuff">
       <header style={styles.header}>
-        <h2 style={styles.title}>Apps</h2>
+        <h2 style={styles.title}>Our stuff</h2>
       </header>
       <div style={styles.grid} role="list">
         {apps.map((app) => (

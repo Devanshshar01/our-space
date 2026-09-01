@@ -101,6 +101,27 @@ export const spaceInvitations = pgTable('space_invitations', {
   inviterIdx: index('space_invitations_inviter_idx').on(table.inviterUserId),
 }));
 
+// ============================================================
+// STEP 5 — Mood / Current Status
+// ============================================================
+
+import { type Mood } from '@/lib/couple-space/validation';
+
+export const moodStatus = pgTable('mood_status', {
+  id: text('id').primaryKey(),
+  spaceId: text('space_id').notNull().references(() => coupleSpaces.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  mood: text('mood').$type<Mood>().notNull(),
+  message: text('message'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  spaceUserUniqueIdx: uniqueIndex('mood_status_space_user_unique').on(table.spaceId, table.userId),
+  spaceIdx: index('mood_status_space_idx').on(table.spaceId),
+  userIdx: index('mood_status_user_idx').on(table.userId),
+}));
+
+export type MoodStatus = typeof moodStatus.$inferSelect;
+
 export type User = typeof user.$inferSelect;
 export type Session = typeof session.$inferSelect;
 export type Account = typeof account.$inferSelect;
