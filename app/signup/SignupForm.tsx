@@ -87,7 +87,7 @@ export default function SignupForm() {
       <div className="auth-card" style={styles.card}>
         <header className="auth-heading" style={styles.header}>
           <p className="eyebrow">Make room for us</p>
-          <h1 style={styles.title}>Create your account.</h1>
+          <h1 style={styles.title}>Let&apos;s make this ours.</h1>
           <p style={styles.subtitle}>Then we&apos;ll make a place to share.</p>
         </header>
 
@@ -177,7 +177,7 @@ export default function SignupForm() {
             disabled={loading}
             style={styles.button}
           >
-            {loading ? 'Creating account…' : 'Create Account'}
+            {loading ? 'Making your account…' : 'Create account'}
           </button>
         </form>
 

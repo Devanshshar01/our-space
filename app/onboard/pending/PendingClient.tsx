@@ -91,7 +91,7 @@ export default function PendingSpaceClient() {
           <p className="eyebrow">Almost there</p>
           <h1 style={styles.title}>Waiting for your person.</h1>
           <p style={styles.subtitle}>
-            Your space is ready. Share the invite link with your partner.
+            Your place is ready. Now invite the other half.
           </p>
         </header>
 

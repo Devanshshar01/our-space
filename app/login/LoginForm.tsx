@@ -46,7 +46,7 @@ export default function LoginForm() {
         <header className="auth-heading" style={styles.header}>
           <p className="eyebrow">Welcome back</p>
           <h1 style={styles.title}>Come on in.</h1>
-          <p style={styles.subtitle}>Welcome back to Couple Space</p>
+          <p style={styles.subtitle}>Welcome back. The place is still here.</p>
         </header>
 
         {error && <div className="error-message" style={styles.error} role="alert">{error}</div>}
@@ -95,7 +95,7 @@ export default function LoginForm() {
             disabled={loading}
             style={styles.button}
           >
-            {loading ? 'Signing in…' : 'Sign In'}
+            {loading ? 'Coming in…' : 'Come in'}
           </button>
         </form>
 

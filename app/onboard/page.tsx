@@ -27,7 +27,7 @@ export default async function OnboardPage() {
       <div style={styles.container}>
         <header className="centered-heading" style={styles.header}>
           <p className="eyebrow" style={styles.eyebrow}>A place for us</p>
-          <h1 style={styles.title}>Set up your space</h1>
+          <h1 style={styles.title}>Make a space for us.</h1>
           <p style={styles.subtitle}>
             Hi {session.user.name}. How should we start?
           </p>

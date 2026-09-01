@@ -108,7 +108,7 @@ export default function JoinClient() {
         <header className="centered-heading" style={styles.header}>
           <p className="eyebrow">An invitation</p>
           <h1 style={styles.title}>Come find us.</h1>
-          <p style={styles.subtitle}>Paste the invite link or code your partner shared.</p>
+          <p style={styles.subtitle}>Paste the link or code they shared with you.</p>
         </header>
 
         {error && <div className="error-message" style={styles.error} role="alert">{error}</div>}
