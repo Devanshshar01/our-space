@@ -949,12 +949,14 @@ button {
 .landing-footnote { margin: 0; color: var(--color-muted); font-size: .75rem; }
 
 .dashboard-layout { background: var(--color-background); }
-.dashboard-header { background: rgba(25, 23, 22, .92) !important; backdrop-filter: blur(10px); }
+.dashboard-header { background: rgba(19, 25, 35, .94) !important; backdrop-filter: blur(10px); }
 .dashboard-header-inner { max-width: 72rem !important; padding-block: .9rem !important; }
 .dashboard-section { margin-bottom: clamp(2rem, 5vw, 3.5rem) !important; }
-.dashboard-hero { max-width: 72rem; margin: 0 auto; padding: clamp(3.5rem, 9vw, 7rem) clamp(0rem, 2vw, 1.5rem) clamp(2.5rem, 6vw, 4.5rem); }
-.dashboard-greeting { margin: 0 0 .8rem; color: var(--color-accent); font-size: .95rem; }
-.dashboard-hero h1 { max-width: 12ch; margin: 0; font-family: var(--font-display); font-size: clamp(2.8rem, 8vw, 5.5rem); font-weight: 400; letter-spacing: -.06em; line-height: .98; }
+.dashboard-mood-section { margin-bottom: clamp(2.5rem, 6vw, 4.5rem) !important; }
+.dashboard-hero { max-width: 72rem; margin: 0 auto; padding: clamp(2.5rem, 7vw, 5.5rem) clamp(0rem, 2vw, 1.5rem) clamp(2.5rem, 6vw, 4.5rem); }
+.dashboard-greeting { margin: 0 0 .8rem; color: var(--color-muted); font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; }
+.dashboard-hero h1 { max-width: 13ch; margin: 0; font-family: var(--font-display); font-size: clamp(2.8rem, 8vw, 5.5rem); font-weight: 400; letter-spacing: -.06em; line-height: .98; }
+.dashboard-space-name { margin: 1.15rem 0 0; color: var(--color-accent); font-size: .95rem; }
 .dashboard-subtitle { margin: 1rem 0 0; color: var(--color-muted); font-size: clamp(1rem, 2vw, 1.15rem); }
 .dashboard-anniversary { margin: 1.5rem 0 0; color: var(--color-muted-light); font-size: .85rem; }
 .couple-banner { text-align: left !important; border-bottom: 0 !important; padding: 0 !important; margin: 0 auto 1rem !important; max-width: 72rem; }
@@ -992,11 +994,24 @@ button {
 .quick-actions-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
 .quick-action { display: flex; align-items: center; gap: .75rem; min-height: 4rem; padding: .85rem 1rem; color: var(--color-foreground); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .8rem; transition: border-color var(--transition-fast), background-color var(--transition-fast); }
 .quick-action:hover { background: var(--color-surface-elevated); border-color: var(--color-border-light); }
+.quick-action-disabled { opacity: .55; cursor: not-allowed; text-align: left; }
+.quick-action-disabled:hover { background: var(--color-surface); border-color: var(--color-border); }
 .quick-action-symbol { display: grid; place-items: center; width: 2rem; height: 2rem; color: var(--color-accent); border: 1px solid var(--color-border); border-radius: .55rem; }
 .quick-action strong, .quick-action small { display: block; }
 .quick-action strong { font-size: .9rem; }
 .quick-action small { margin-top: .15rem; color: var(--color-muted); font-size: .75rem; }
 @media (max-width: 480px) { .quick-actions-grid { grid-template-columns: 1fr; } }
+
+.app-launcher { padding-top: .25rem; }
+.app-launcher-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: .75rem !important; }
+.app-card-available { grid-column: span 2; }
+.app-card:hover { border-color: var(--color-border-light) !important; background: var(--color-surface-elevated) !important; transform: translateY(-1px); }
+.app-card-available { min-height: 12rem !important; }
+.app-card-coming-soon { min-height: 8rem !important; opacity: .72; }
+.app-card-coming-soon .app-card-icon { opacity: .65; }
+.app-card-coming-soon h3 { font-size: 1rem !important; }
+.app-card-coming-soon p { font-size: .8rem !important; }
+.app-card-coming-soon button { min-height: 2.5rem !important; }
 
 @media (max-width: 767px) {
   .landing-inner { min-height: calc(100dvh - 2rem); }
@@ -1004,4 +1019,9 @@ button {
   .landing-content { padding-top: 4rem; }
   .dashboard-hero { padding-inline: 0; }
   .dashboard-header-inner { padding-inline: 1rem !important; }
+}
+
+@media (max-width: 767px) {
+  .app-launcher-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .app-card-available { grid-column: span 1; }
 }

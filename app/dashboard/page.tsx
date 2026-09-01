@@ -72,7 +72,7 @@ export default async function DashboardPage() {
           currentUserName={currentUserName}
         />
 
-        <div id="mood" className="dashboard-section" style={styles.section}>
+        <div id="mood" className="dashboard-section dashboard-mood-section" style={styles.section}>
           <MoodSection
             moods={moods.ok ? moods.moods : { me: null, partner: null }}
             currentUserName={currentUserName}
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
           <QuickActions canvasUrl={canvasUrl} notesUrl={notesUrl} />
         </div>
 
-        <div id="apps" className="dashboard-section" style={styles.section}>
+        <div id="apps" className="dashboard-section dashboard-apps-section" style={styles.section}>
           <AppLauncher canvasUrl={canvasUrl} notesUrl={notesUrl} />
         </div>
       </main>

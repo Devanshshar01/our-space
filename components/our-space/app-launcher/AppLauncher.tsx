@@ -137,11 +137,11 @@ export default function AppLauncher({ canvasUrl, notesUrl }: AppLauncherProps) {
   }, [canvasUrl, notesUrl]);
 
   return (
-    <section style={styles.section} aria-label="Our stuff">
+    <section className="app-launcher" style={styles.section} aria-labelledby="our-stuff-heading">
       <header style={styles.header}>
-        <h2 style={styles.title}>Our stuff</h2>
+        <h2 id="our-stuff-heading" style={styles.title}>Our stuff</h2>
       </header>
-      <div style={styles.grid} role="list">
+      <div className="app-launcher-grid" style={styles.grid} role="list">
         {apps.map((app) => (
           <AppCard
             key={app.name}

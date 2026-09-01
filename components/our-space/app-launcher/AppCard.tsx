@@ -15,7 +15,7 @@ export default function AppCard({ name, description, icon, href, status, externa
   const isComingSoon = status === 'coming-soon';
 
   return (
-    <article style={styles.card}>
+    <article className={`app-card${isComingSoon ? ' app-card-coming-soon' : ' app-card-available'}`} style={styles.card}>
       {isComingSoon && (
         <div style={styles.comingSoonBadge}>Coming soon</div>
       )}
@@ -54,6 +54,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: '0.75rem',
     minHeight: '180px',
+    transition: 'border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease',
   },
   comingSoonBadge: {
     position: 'absolute',
