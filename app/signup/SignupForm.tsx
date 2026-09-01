@@ -224,9 +224,9 @@ const styles: Record<string, React.CSSProperties> = {
     color: 'var(--color-muted)',
   },
   error: {
-    backgroundColor: 'rgba(220, 53, 69, 0.15)',
-    border: '1px solid rgba(220, 53, 69, 0.3)',
-    color: '#dc3545',
+    backgroundColor: 'var(--color-error-bg)',
+    border: '1px solid var(--color-error-border)',
+    color: 'var(--color-error)',
     padding: '0.75rem 1rem',
     borderRadius: '8px',
     fontSize: '0.875rem',

@@ -104,7 +104,7 @@ export default function JoinClient() {
 
   return (
     <main className="centered-shell" style={styles.main}>
-      <div style={styles.card}>
+      <div className="auth-card" style={styles.card}>
         <header className="centered-heading" style={styles.header}>
           <p className="eyebrow">An invitation</p>
           <h1 style={styles.title}>Come find us.</h1>
@@ -113,7 +113,7 @@ export default function JoinClient() {
 
         {error && <div className="error-message" style={styles.error} role="alert">{error}</div>}
 
-        <form onSubmit={handleSubmit} style={styles.form} noValidate>
+        <form onSubmit={handleSubmit} className="form-stack" style={styles.form} noValidate>
           <div style={styles.field}>
             <label htmlFor="code" style={styles.label}>
               Invite link or code
@@ -179,9 +179,9 @@ const styles: Record<string, React.CSSProperties> = {
     color: 'var(--color-muted)',
   },
   error: {
-    backgroundColor: 'rgba(220, 53, 69, 0.15)',
-    border: '1px solid rgba(220, 53, 69, 0.3)',
-    color: '#dc3545',
+    backgroundColor: 'var(--color-error-bg)',
+    border: '1px solid var(--color-error-border)',
+    color: 'var(--color-error)',
     padding: '0.75rem 1rem',
     borderRadius: '8px',
     fontSize: '0.875rem',

@@ -33,7 +33,7 @@ export default async function OnboardPage() {
           </p>
         </header>
 
-        <div style={styles.options}>
+        <div className="onboard-options" style={styles.options}>
           <Link href="/onboard/create" style={styles.option}>
             <div style={styles.optionHeader}>
               <h2 style={styles.optionTitle}>Create our space</h2>

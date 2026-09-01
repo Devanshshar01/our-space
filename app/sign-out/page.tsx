@@ -50,7 +50,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: '1rem',
   },
   error: {
-    color: '#dc3545',
+    color: 'var(--color-error)',
     fontSize: '0.9rem',
   },
 };
