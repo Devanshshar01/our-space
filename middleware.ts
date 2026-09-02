@@ -20,7 +20,8 @@ export function middleware(request: NextRequest) {
 
   // Lightweight cookie-based check at the edge layer.
   // Server pages and API routes still perform full session validation via Better Auth.
-  const sessionToken = request.cookies.get('better-auth.session_token');
+  const sessionToken = request.cookies.get('better-auth.session_token')
+    ?? request.cookies.get('__Secure-better-auth.session_token');
   if (!sessionToken) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
