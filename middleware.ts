@@ -7,6 +7,7 @@ const authApiPath = '/api/auth';
 function isPublic(pathname: string): boolean {
   if (publicPaths.includes(pathname)) return true;
   if (pathname === '/.well-known/openid-configuration' || pathname === '/.well-known/oauth-authorization-server') return true;
+  if (pathname === '/api/oauth/membership') return true;
   if (pathname.startsWith(authApiPath)) return true;
   return false;
 }
