@@ -17,8 +17,9 @@
     "test:watch": "dotenv -e .env.local -- vitest"
   },
   "dependencies": {
+    "@better-auth/oauth-provider": "1.4.8",
     "@neondatabase/serverless": "1.0.1",
-    "better-auth": "1.2.7",
+    "better-auth": "1.4.8",
     "drizzle-orm": "0.41.0",
     "next": "15.2.8",
     "postgres": "3.4.5",
@@ -36,7 +37,7 @@
     "@vitejs/plugin-react": "4.3.4",
     "autoprefixer": "10.4.21",
     "dotenv-cli": "^11.0.0",
-    "drizzle-kit": "0.30.5",
+    "drizzle-kit": "0.31.4",
     "eslint": "9.22.0",
     "jsdom": "26.0.0",
     "postcss": "8.5.3",

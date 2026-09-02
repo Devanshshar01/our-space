@@ -1,8 +1,15 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { oauthProvider } from '@better-auth/oauth-provider';
+import { jwt } from 'better-auth/plugins';
 import { db } from '@/lib/db';
+import { getCurrentCoupleSpace } from '@/lib/couple-space/service';
+import { getAuthIssuer, getAuthOrigin } from './config';
+
+const firstPartyClientIds = new Set(['canvas', 'notes']);
 
 export const auth = betterAuth({
+  baseURL: getAuthOrigin(),
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
@@ -24,5 +31,29 @@ export const auth = betterAuth({
       path: '/',
     },
   },
-  trustedOrigins: [process.env.BETTER_AUTH_URL || 'http://localhost:3000'],
+  trustedOrigins: [getAuthOrigin()],
+  plugins: [
+    jwt({
+      jwt: {
+        issuer: getAuthIssuer(),
+      },
+      jwks: {
+        keyPairConfig: { alg: 'RS256' },
+      },
+    }),
+    oauthProvider({
+      scopes: ['openid', 'profile', 'email'],
+      grantTypes: ['authorization_code'],
+      loginPage: '/login',
+      consentPage: '/oauth/consent',
+      allowDynamicClientRegistration: false,
+      allowUnauthenticatedClientRegistration: false,
+      cachedTrustedClients: firstPartyClientIds,
+      postLogin: {
+        page: '/oauth/denied',
+        shouldRedirect: async ({ user }) => (await getCurrentCoupleSpace(user.id)) === null,
+        consentReferenceId: async () => undefined,
+      },
+    }),
+  ],
 });

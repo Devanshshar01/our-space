@@ -4,11 +4,13 @@ import { useState, FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { authClient } from '@/lib/auth/client';
+import { getSafeInternalRedirect } from '@/lib/auth/redirect';
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/onboard';
+  const redirect = getSafeInternalRedirect(searchParams.get('redirect'));
+  const oauthFlow = typeof searchParams.has === 'function' && searchParams.has('sig');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +27,7 @@ export default function LoginForm() {
         { email, password },
         {
           onSuccess: () => {
+            if (oauthFlow) return;
             router.push(redirect);
             router.refresh();
           },
@@ -95,7 +98,7 @@ export default function LoginForm() {
             disabled={loading}
             style={styles.button}
           >
-            {loading ? 'Coming in…' : 'Come in'}
+            {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
 

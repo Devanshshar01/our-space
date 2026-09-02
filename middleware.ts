@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const publicPaths = ['/', '/login', '/signup', '/onboard', '/join', '/sign-out'];
+const publicPaths = ['/', '/login', '/signup', '/onboard', '/join', '/sign-out', '/oauth/denied', '/oauth/consent'];
 const authApiPath = '/api/auth';
 
 function isPublic(pathname: string): boolean {
   if (publicPaths.includes(pathname)) return true;
+  if (pathname === '/.well-known/openid-configuration' || pathname === '/.well-known/oauth-authorization-server') return true;
   if (pathname.startsWith(authApiPath)) return true;
   return false;
 }
