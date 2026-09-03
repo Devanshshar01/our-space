@@ -1,7 +1,9 @@
-import { verifyAccessToken } from 'better-auth/oauth2';
 import { NextResponse } from 'next/server';
 import { getCurrentCoupleSpace } from '@/lib/couple-space/service';
 import { getAuthIssuer } from '@/lib/auth/config';
+import { db } from '@/lib/db';
+import { oauthAccessToken } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 const clients = ['canvas', 'notes'];
 
@@ -21,32 +23,37 @@ export async function GET(request: Request) {
   }
 
   try {
-    const payload = await verifyAccessToken(token, {
-      jwksUrl: `${getAuthIssuer()}/api/auth/jwks`,
-      verifyOptions: {
-        issuer: getAuthIssuer(),
-        audience: clients,
-      },
-    });
+    const tokens = await db
+      .select({ userId: oauthAccessToken.userId, expiresAt: oauthAccessToken.expiresAt, clientId: oauthAccessToken.clientId })
+      .from(oauthAccessToken)
+      .where(eq(oauthAccessToken.token, token))
+      .limit(1);
 
-    if (typeof payload.sub !== 'string' || !payload.sub) {
+    const tokenRecord = tokens[0];
+
+    if (!tokenRecord || !tokenRecord.userId || tokenRecord.expiresAt < new Date()) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const membership = await getCurrentCoupleSpace(payload.sub);
+    if (!clients.includes(tokenRecord.clientId)) {
+       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const membership = await getCurrentCoupleSpace(tokenRecord.userId);
     if (!membership) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     return NextResponse.json({
-      sub: payload.sub,
+      sub: tokenRecord.userId,
       issuer: getAuthIssuer(),
       membership: {
         active: true,
         coupleSpaceId: membership.space.id,
       },
     });
-  } catch {
+  } catch (err) {
+    console.error('[membership] token lookup failed:', err instanceof Error ? err.message : String(err));
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 }
