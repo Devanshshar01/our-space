@@ -33,10 +33,13 @@ export const auth = betterAuth({
   },
   trustedOrigins: [
     getAuthOrigin(),
-    process.env.NEXT_PUBLIC_CANVAS_APP_URL || 'http://localhost:3001',
-    process.env.NEXT_PUBLIC_NOTES_APP_URL || 'http://localhost:3002',
     'https://widget-woad-nine.vercel.app',
     'https://notes-rust-five.vercel.app',
+    ...(process.env.NODE_ENV !== 'production'
+      ? ['http://localhost:3001', 'http://localhost:3002']
+      : []),
+    ...(process.env.NEXT_PUBLIC_CANVAS_APP_URL ? [process.env.NEXT_PUBLIC_CANVAS_APP_URL] : []),
+    ...(process.env.NEXT_PUBLIC_NOTES_APP_URL ? [process.env.NEXT_PUBLIC_NOTES_APP_URL] : []),
   ],
   plugins: [
     jwt({
