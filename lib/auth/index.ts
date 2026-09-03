@@ -31,7 +31,13 @@ export const auth = betterAuth({
       path: '/',
     },
   },
-  trustedOrigins: [getAuthOrigin()],
+  trustedOrigins: [
+    getAuthOrigin(),
+    process.env.NEXT_PUBLIC_CANVAS_APP_URL || 'http://localhost:3001',
+    process.env.NEXT_PUBLIC_NOTES_APP_URL || 'http://localhost:3002',
+    'https://widget-woad-nine.vercel.app',
+    'https://notes-rust-five.vercel.app',
+  ],
   plugins: [
     jwt({
       jwt: {
