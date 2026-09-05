@@ -1,2 +1,0 @@
-// This file forces a fresh Vercel deployment of the membership endpoint fix.
-// It will be reverted immediately after Vercel picks up the deployment.
