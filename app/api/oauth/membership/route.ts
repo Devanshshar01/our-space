@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import postgres from 'postgres';
+import { createHash } from 'node:crypto';
 import { getCurrentCoupleSpace } from '@/lib/couple-space/service';
 import { getAuthIssuer } from '@/lib/auth/config';
 import { sqlClient } from '@/lib/db';
@@ -13,6 +14,16 @@ function getBearerToken(request: Request): string | null {
   if (!header?.startsWith('Bearer ')) return null;
   const token = header.slice('Bearer '.length).trim();
   return token || null;
+}
+
+// The Better Auth @better-auth/oauth-provider plugin stores opaque tokens
+// in oauth_access_token.token as base64url(sha256(raw_token)) by default
+// (storeTokens defaults to "hashed"). To look up a token we must hash
+// the incoming bearer the same way.
+function hashToken(raw: string): string {
+  return createHash('sha256')
+    .update(raw)
+    .digest('base64url');
 }
 
 async function lookupTokenDirect(token: string): Promise<{
@@ -61,9 +72,19 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const hashedToken = hashToken(token);
+  const incomingFingerprint = createHash('sha256')
+    .update(token)
+    .digest('hex')
+    .slice(0, 16);
+  const hashedFingerprint = createHash('sha256')
+    .update(hashedToken)
+    .digest('hex')
+    .slice(0, 16);
+
   let row: Awaited<ReturnType<typeof lookupTokenDirect>>;
   try {
-    row = await lookupTokenDirect(token);
+    row = await lookupTokenDirect(hashedToken);
   } catch (err) {
     console.error(
       '[membership] direct oauth_access_token lookup threw:',
@@ -78,33 +99,25 @@ export async function GET(request: Request) {
       const r = await sqlClient`SELECT current_database() AS db, inet_server_addr()::text AS host`;
       dbIdentity = { db: r[0]?.db ?? null, host: r[0]?.host ?? null };
     } catch {}
-    const incomingFingerprint = require('node:crypto')
-      .createHash('sha256')
-      .update(token)
-      .digest('hex')
-      .slice(0, 16);
     console.warn(
       '[TOKEN_FINGERPRINT_OURSPACE]',
       JSON.stringify({
         source: 'our-space/oauth/membership',
         fingerprint: incomingFingerprint,
+        hashedFingerprint,
         tokenLength: token.length,
         rowFound: false,
         db: dbIdentity,
       }),
     );
-    return NextResponse.json({ error: 'Unauthorized', db: dbIdentity, fingerprint: incomingFingerprint }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized', db: dbIdentity, fingerprint: incomingFingerprint, hashedFingerprint }, { status: 401 });
   }
-  const incomingFingerprint = require('node:crypto')
-    .createHash('sha256')
-    .update(token)
-    .digest('hex')
-    .slice(0, 16);
   console.warn(
     '[TOKEN_FINGERPRINT_OURSPACE]',
     JSON.stringify({
       source: 'our-space/oauth/membership',
       fingerprint: incomingFingerprint,
+      hashedFingerprint,
       tokenLength: token.length,
       rowFound: true,
       clientId: row.clientId,
