@@ -52,11 +52,18 @@ export async function GET(request: Request) {
 
   const tokenRecord = tokenRows[0];
   if (!tokenRecord) {
+    let dbIdentity: string | null = null;
+    try {
+      const r = await sqlClient`SELECT current_database() AS db`;
+      dbIdentity = r[0]?.db ?? null;
+    } catch {}
     console.warn(
       '[membership] no oauth_access_token row found for token',
       maskToken(token),
+      'db=',
+      dbIdentity,
     );
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized', db: dbIdentity }, { status: 401 });
   }
   if (!tokenRecord.userId) {
     console.warn(
