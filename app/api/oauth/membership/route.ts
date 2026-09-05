@@ -52,16 +52,20 @@ export async function GET(request: Request) {
 
   const tokenRecord = tokenRows[0];
   if (!tokenRecord) {
-    let dbIdentity: string | null = null;
+    let dbIdentity: Record<string, string | null> = {};
     try {
-      const r = await sqlClient`SELECT current_database() AS db`;
-      dbIdentity = r[0]?.db ?? null;
+      const r = await sqlClient`SELECT current_database() AS db, current_user AS usr, inet_server_addr()::text AS host`;
+      dbIdentity = {
+        db: r[0]?.db ?? null,
+        user: r[0]?.usr ?? null,
+        host: r[0]?.host ?? null,
+      };
     } catch {}
     console.warn(
       '[membership] no oauth_access_token row found for token',
       maskToken(token),
       'db=',
-      dbIdentity,
+      JSON.stringify(dbIdentity),
     );
     return NextResponse.json({ error: 'Unauthorized', db: dbIdentity }, { status: 401 });
   }
