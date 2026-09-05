@@ -15,11 +15,6 @@ function getBearerToken(request: Request): string | null {
   return token || null;
 }
 
-function maskToken(token: string): string {
-  if (token.length <= 6) return '***';
-  return token.slice(0, 3) + '…' + token.slice(-3);
-}
-
 async function lookupTokenDirect(token: string): Promise<{
   userId: string | null;
   expiresAt: Date | null;
@@ -83,14 +78,41 @@ export async function GET(request: Request) {
       const r = await sqlClient`SELECT current_database() AS db, inet_server_addr()::text AS host`;
       dbIdentity = { db: r[0]?.db ?? null, host: r[0]?.host ?? null };
     } catch {}
+    const incomingFingerprint = require('node:crypto')
+      .createHash('sha256')
+      .update(token)
+      .digest('hex')
+      .slice(0, 16);
     console.warn(
-      '[membership] no oauth_access_token row found for token',
-      maskToken(token),
-      'identity=',
-      JSON.stringify(dbIdentity),
+      '[TOKEN_FINGERPRINT_OURSPACE]',
+      JSON.stringify({
+        source: 'our-space/oauth/membership',
+        fingerprint: incomingFingerprint,
+        tokenLength: token.length,
+        rowFound: false,
+        db: dbIdentity,
+      }),
     );
-    return NextResponse.json({ error: 'Unauthorized', db: dbIdentity }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized', db: dbIdentity, fingerprint: incomingFingerprint }, { status: 401 });
   }
+  const incomingFingerprint = require('node:crypto')
+    .createHash('sha256')
+    .update(token)
+    .digest('hex')
+    .slice(0, 16);
+  console.warn(
+    '[TOKEN_FINGERPRINT_OURSPACE]',
+    JSON.stringify({
+      source: 'our-space/oauth/membership',
+      fingerprint: incomingFingerprint,
+      tokenLength: token.length,
+      rowFound: true,
+      clientId: row.clientId,
+      userId: row.userId,
+      expiresAt: row.expiresAt.toISOString(),
+      db: { db: row.db, host: row.host },
+    }),
+  );
   if (row.expiresAt.getTime() <= Date.now()) {
     console.warn(
       '[membership] token expired for clientId=',
@@ -98,14 +120,14 @@ export async function GET(request: Request) {
       'expiresAt=',
       row.expiresAt.toISOString(),
     );
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized', fingerprint: incomingFingerprint, clientId: row.clientId, expiresAt: row.expiresAt.toISOString() }, { status: 401 });
   }
   if (!allowedClients.has(row.clientId)) {
     console.warn(
       '[membership] disallowed clientId=',
       row.clientId,
     );
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized', fingerprint: incomingFingerprint, clientId: row.clientId }, { status: 401 });
   }
 
   let membership;
