@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
+import postgres from 'postgres';
 import { getCurrentCoupleSpace } from '@/lib/couple-space/service';
 import { getAuthIssuer } from '@/lib/auth/config';
-import { db, sqlClient } from '@/lib/db';
-import { oauthAccessToken } from '@/lib/db/schema';
+import { sqlClient } from '@/lib/db';
 
 const allowedClients = new Set(['canvas', 'notes']);
 
@@ -21,81 +20,97 @@ function maskToken(token: string): string {
   return token.slice(0, 3) + '…' + token.slice(-3);
 }
 
+async function lookupTokenDirect(token: string): Promise<{
+  userId: string | null;
+  expiresAt: Date | null;
+  clientId: string | null;
+  db: string | null;
+  host: string | null;
+} | null> {
+  const connectionString = process.env['DATABASE_URL']?.replace(
+    'sslmode=require',
+    'sslmode=verify-full',
+  );
+  if (!connectionString) return null;
+  const client = postgres(connectionString, { max: 1, idle_timeout: 5, prepare: false });
+  try {
+    const r = await client<
+      { user_id: string | null; expires_at: Date; client_id: string; db: string; host: string }[]
+    >`
+      SELECT user_id, expires_at, client_id,
+             current_database() AS db,
+             inet_server_addr()::text AS host
+        FROM oauth_access_token
+       WHERE token = ${token}
+       LIMIT 1
+    `;
+    if (r.length === 0) {
+      return { userId: null, expiresAt: null, clientId: null, db: null, host: null };
+    }
+    const row = r[0]!;
+    return {
+      userId: row.user_id,
+      expiresAt: new Date(row.expires_at),
+      clientId: row.client_id,
+      db: row.db,
+      host: row.host,
+    };
+  } finally {
+    await client.end();
+  }
+}
+
 export async function GET(request: Request) {
   const token = getBearerToken(request);
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let tokenRows: Array<{
-    userId: string | null;
-    expiresAt: Date;
-    clientId: string;
-  }>;
+  let row: Awaited<ReturnType<typeof lookupTokenDirect>>;
   try {
-    tokenRows = await db
-      .select({
-        userId: oauthAccessToken.userId,
-        expiresAt: oauthAccessToken.expiresAt,
-        clientId: oauthAccessToken.clientId,
-      })
-      .from(oauthAccessToken)
-      .where(eq(oauthAccessToken.token, token))
-      .limit(1);
+    row = await lookupTokenDirect(token);
   } catch (err) {
     console.error(
-      '[membership] oauth_access_token lookup threw:',
+      '[membership] direct oauth_access_token lookup threw:',
       err instanceof Error ? err.message : String(err),
     );
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 
-  const tokenRecord = tokenRows[0];
-  if (!tokenRecord) {
-    let dbIdentity: Record<string, string | null> = {};
+  if (!row || !row.userId || !row.clientId || !row.expiresAt) {
+    let dbIdentity: Record<string, string | null> = { db: row?.db ?? null, host: row?.host ?? null };
     try {
-      const r = await sqlClient`SELECT current_database() AS db, current_user AS usr, inet_server_addr()::text AS host`;
-      dbIdentity = {
-        db: r[0]?.db ?? null,
-        user: r[0]?.usr ?? null,
-        host: r[0]?.host ?? null,
-      };
+      const r = await sqlClient`SELECT current_database() AS db, inet_server_addr()::text AS host`;
+      dbIdentity = { db: r[0]?.db ?? null, host: r[0]?.host ?? null };
     } catch {}
     console.warn(
       '[membership] no oauth_access_token row found for token',
       maskToken(token),
-      'db=',
+      'identity=',
       JSON.stringify(dbIdentity),
     );
     return NextResponse.json({ error: 'Unauthorized', db: dbIdentity }, { status: 401 });
   }
-  if (!tokenRecord.userId) {
-    console.warn(
-      '[membership] token has no userId for token',
-      maskToken(token),
-    );
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (tokenRecord.expiresAt.getTime() <= Date.now()) {
+  if (row.expiresAt.getTime() <= Date.now()) {
     console.warn(
       '[membership] token expired for clientId=',
-      tokenRecord.clientId,
+      row.clientId,
       'expiresAt=',
-      tokenRecord.expiresAt.toISOString(),
+      row.expiresAt.toISOString(),
     );
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  if (!allowedClients.has(tokenRecord.clientId)) {
+  if (!allowedClients.has(row.clientId)) {
     console.warn(
       '[membership] disallowed clientId=',
-      tokenRecord.clientId,
+      row.clientId,
     );
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   let membership;
   try {
-    membership = await getCurrentCoupleSpace(tokenRecord.userId);
+    membership = await getCurrentCoupleSpace(row.userId);
   } catch (err) {
     console.error(
       '[membership] getCurrentCoupleSpace threw:',
@@ -108,16 +123,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  let dbIdentity: string | null = null;
-  try {
-    const r = await sqlClient`SELECT current_database() AS db`;
-    dbIdentity = r[0]?.db ?? null;
-  } catch {}
-
   return NextResponse.json({
-    sub: tokenRecord.userId,
+    sub: row.userId,
     issuer: getAuthIssuer(),
-    db: dbIdentity,
+    db: { db: row.db, host: row.host },
     membership: {
       active: true,
       coupleSpaceId: membership.space.id,
